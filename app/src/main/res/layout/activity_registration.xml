@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".RegistrationActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_gravity="center_horizontal"
+        android:text="Register"
+        android:textColor="@color/main_color"
+        android:textStyle="bold"
+        android:textSize="48sp" />
+
+    <EditText
+        android:id="@+id/et_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:hint="Username"
+        android:background="@drawable/rounded_edittext"
+        android:inputType="text"
+        android:padding="16dp"
+        android:drawableStart="@drawable/ic_user"
+        android:drawablePadding="8dp" />
+
+    <EditText
+        android:id="@+id/et_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Email"
+        android:background="@drawable/rounded_edittext"
+        android:inputType="textEmailAddress"
+        android:padding="16dp"
+        android:drawableStart="@drawable/ic_email"
+        android:drawablePadding="8dp" />
+
+    <EditText
+       android:id="@+id/et_block"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Block"
+        android:background="@drawable/rounded_edittext"
+        android:inputType="textEmailAddress"
+        android:padding="16dp"
+        android:drawableStart="@drawable/hotel_336802"
+        android:drawablePadding="8dp" />
+    <EditText
+        android:id="@+id/et_enrollment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Enrollment No"
+        android:background="@drawable/rounded_edittext"
+        android:inputType="number"
+        android:padding="16dp"
+        android:drawableStart="@drawable/ic_enrollment"
+        android:drawablePadding="8dp" />
+
+    <EditText
+        android:id="@+id/et_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Password"
+        android:background="@drawable/rounded_edittext"
+        android:inputType="textPassword"
+        android:padding="16dp"
+        android:drawableStart="@drawable/ic_password"
+        android:drawablePadding="8dp" />
+
+    <EditText
+        android:id="@+id/et_confirm_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Confirm Password"
+        android:background="@drawable/rounded_edittext"
+        android:inputType="textPassword"
+        android:padding="16dp"
+        android:drawableStart="@drawable/ic_password"
+        android:drawablePadding="8dp" />
+
+    <Button
+        android:id="@+id/btn_register"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="12dp"
+        android:text="Register"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="Already have an account?" />
+
+        <TextView
+            android:id="@+id/tv_login_here"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:textSize="16sp"
+            android:textColor="@color/main_color"
+            android:text="Login Here" />
+
+    </LinearLayout>
+
+</LinearLayout>

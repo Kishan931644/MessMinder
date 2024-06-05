@@ -9,13 +9,28 @@
         android:id="@+id/navigation_home"
         android:name="com.jignesh.messminder.ui.idcard.HomeFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/action_firstFragment_to_secondFragment"
+            app:destination="@id/navigation_dashboard">
+        <argument
+            android:name="param_email"
+            app:argType="string" />
+        </action>
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.jignesh.messminder.ui.schedule.DashboardFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_dashboard">
+
+        <argument
+            android:name="param_email"
+            app:argType="string" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_notifications"

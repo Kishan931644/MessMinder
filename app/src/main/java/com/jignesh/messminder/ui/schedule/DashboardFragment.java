@@ -5,11 +5,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.jignesh.messminder.Utilities;
 import com.jignesh.messminder.databinding.FragmentDashboardBinding;
 
 public class DashboardFragment extends Fragment {
@@ -24,6 +26,12 @@ public class DashboardFragment extends Fragment {
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        try {
+            String email = Utilities.getEmail(requireContext());
+            Toast.makeText(requireContext(), email, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(requireContext(), e.toString(), Toast.LENGTH_SHORT).show();
+        }
 
         return root;
     }

@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.jignesh.messminder.DBHelper;
+import com.jignesh.messminder.Utilities;
 import com.jignesh.messminder.databinding.FragmentHomeBinding;
 
 public class HomeFragment extends Fragment {
@@ -34,8 +35,13 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        String userEmail = getArguments().getString("email");
-        Log.e("Emks", userEmail);
+        try {
+            String email = Utilities.getEmail(requireContext());
+            Toast.makeText(requireContext(), email, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(requireContext(), e.toString(), Toast.LENGTH_SHORT).show();
+        }
+
 //        try {
 //            // Fetch data from the database (replace with your actual database access code)
 //            String userEmail = getArguments().getString("email");

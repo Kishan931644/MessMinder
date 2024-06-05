@@ -1,6 +1,7 @@
 package com.jignesh.messminder;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -23,13 +24,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        String email = getIntent().getStringExtra("email");
-
-        HomeFragment hm = new HomeFragment();
-        Bundle b1 = new Bundle();
-        b1.putString("email", email);
-        hm.setArguments(b1);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

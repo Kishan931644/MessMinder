@@ -46,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     if(dbHelper.loginUser(email,password)){
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        intent.putExtra("email", email);
+                        Utilities.storeData(LoginActivity.this, email);
                         startActivity(intent);
                     }else {
                         Toast.makeText(LoginActivity.this, "Please enter valid email and password", Toast.LENGTH_SHORT).show();

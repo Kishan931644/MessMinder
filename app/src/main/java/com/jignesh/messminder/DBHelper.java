@@ -6,6 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "UserDB";
     private static final int DATABASE_VERSION = 1;
@@ -20,7 +23,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String COLUMN_ENROLLMENT = "enr_no";
     private static final String COLUMN_BLOCK = "block";
     private static final String COLUMN_PASSWORD = "password";
-
+    private static final String COLUMN_STATUS = "status";
     // Create table SQL query
     private static final String CREATE_TABLE_USERS =
             "CREATE TABLE " + TABLE_USERS + "("
@@ -29,7 +32,8 @@ public class DBHelper extends SQLiteOpenHelper {
                     + COLUMN_EMAIL + " TEXT,"
                     + COLUMN_BLOCK + " TEXT,"
                     + COLUMN_ENROLLMENT + " TEXT,"
-                    + COLUMN_PASSWORD + " TEXT"
+                    + COLUMN_PASSWORD + " TEXT,"
+                    + COLUMN_STATUS + " TEXT"
                     + ")";
 
     public DBHelper(Context context) {
@@ -56,7 +60,7 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(COLUMN_ENROLLMENT, enrollment);
         values.put(COLUMN_BLOCK, block);
         values.put(COLUMN_PASSWORD, password);
-
+        values.put(COLUMN_STATUS,"0");
         db.insert(TABLE_USERS, null, values);
         db.close();
     }
@@ -117,5 +121,38 @@ public class DBHelper extends SQLiteOpenHelper {
         // Return the user object (null if not found)
         return userDetailsArray;
     }
+
+    public List<String[]> getAllUsers() {
+        List<String[]> usersList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String[] columns = {
+                COLUMN_ID,
+                COLUMN_USERNAME,
+                COLUMN_EMAIL,
+                COLUMN_ENROLLMENT,
+                COLUMN_BLOCK,
+                COLUMN_PASSWORD,
+                COLUMN_STATUS
+        };
+
+        Cursor cursor = db.query(TABLE_USERS, columns, null, null, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                String[] user = new String[cursor.getColumnCount()];
+                for (int i = 0; i < cursor.getColumnCount(); i++) {
+                    user[i] = cursor.getString(i);
+                }
+                usersList.add(user);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return usersList;
+    }
+
 }
 

@@ -19,8 +19,10 @@ import java.util.Random;
 
 import dev.shreyaspatil.easyupipayment.EasyUpiPayment;
 import dev.shreyaspatil.easyupipayment.exception.AppNotFoundException;
+import dev.shreyaspatil.easyupipayment.listener.PaymentStatusListener;
+import dev.shreyaspatil.easyupipayment.model.TransactionDetails;
 
-public class NotificationsFragment extends Fragment {
+public class NotificationsFragment extends Fragment implements PaymentStatusListener {
     private Button paybtn;
 
     private FragmentNotificationsBinding binding;
@@ -48,6 +50,7 @@ public class NotificationsFragment extends Fragment {
                         .setAmount("10.00");
                 try {
                     EasyUpiPayment easyUpiPayment = builder.build();
+                    easyUpiPayment.setPaymentStatusListener(NotificationsFragment.this);
                     easyUpiPayment.startPayment();
                 } catch (AppNotFoundException e) {
                     throw new RuntimeException(e);
@@ -62,5 +65,15 @@ public class NotificationsFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onTransactionCancelled() {
+
+    }
+
+    @Override
+    public void onTransactionCompleted(@NonNull TransactionDetails transactionDetails) {
+
     }
 }

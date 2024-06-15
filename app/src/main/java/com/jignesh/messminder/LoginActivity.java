@@ -1,9 +1,11 @@
 package com.jignesh.messminder;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -23,6 +25,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         dbHelper = new DBHelper(this);
 
         etEmail = findViewById(R.id.et_email);
@@ -41,14 +44,14 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
-                if (email.equals("admin@gmail.com") && password.equals("IAmAdmin")) {
+                if (email.equals("admin@gmail.com") && password.equals("admin")) {
                     startActivity(new Intent(LoginActivity.this, AdminActivity.class));
                 } else {
-                    if(dbHelper.loginUser(email,password)){
+                    if (dbHelper.loginUser(email, password)) {
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        intent.putExtra("email", email);
+//                        intent.putExtra("email", email);
                         startActivity(intent);
-                    }else {
+                    } else {
                         Toast.makeText(LoginActivity.this, "Please enter valid email and password", Toast.LENGTH_SHORT).show();
                         return;
                     }

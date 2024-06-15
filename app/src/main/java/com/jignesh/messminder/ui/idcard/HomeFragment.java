@@ -32,6 +32,8 @@ import java.io.IOException;
 public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private TextView nameTextView;
+
+
     private TextView enrollmentTextView;
     private TextView numberTextView;
     private TextView emailTextView;

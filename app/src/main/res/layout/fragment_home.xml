@@ -10,7 +10,6 @@
     tools:context=".ui.idcard.HomeFragment">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="8dp"
@@ -172,11 +171,9 @@
     </androidx.cardview.widget.CardView>
 
     <Button
-        android:id="@+id/generatePDF"
-        android:layout_width="wrap_content"
+        android:id="@+id/btn_download_pdf"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:layout_margin="10dp"
-        android:text="Generate PDF"
-        android:textAlignment="center"        />
+        android:text="Download PDF" />
+
 </LinearLayout>

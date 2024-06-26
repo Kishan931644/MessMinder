@@ -1,13 +1,18 @@
 package com.jignesh.messminder;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "UserDB";
@@ -24,6 +29,9 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String COLUMN_BLOCK = "block";
     private static final String COLUMN_PASSWORD = "password";
     private static final String COLUMN_STATUS = "status";
+    private static final String COLUMN_PHONE = "phone";
+    private static final String COLUMN_PAYMENT_DATE = "payment_date";
+
     // Create table SQL query
     private static final String CREATE_TABLE_USERS =
             "CREATE TABLE " + TABLE_USERS + "("
@@ -33,7 +41,21 @@ public class DBHelper extends SQLiteOpenHelper {
                     + COLUMN_BLOCK + " TEXT,"
                     + COLUMN_ENROLLMENT + " TEXT,"
                     + COLUMN_PASSWORD + " TEXT,"
-                    + COLUMN_STATUS + " TEXT"
+                    + COLUMN_STATUS + " TEXT,"
+                    + COLUMN_PHONE + " TEXT,"
+                    + COLUMN_PAYMENT_DATE + " TEXT"
+                    + ")";
+
+    private static final String TABLE_SETTINGS = "settings";
+    private static final String COLUMN_SETTINGS_ID = "id";
+    private static final String COLUMN_SETTINGS_KEY = "day";
+    private static final String COLUMN_SETTINGS_VALUE = "value";
+
+    private static final String CREATE_TABLE_SETTINGS =
+            "CREATE TABLE " + TABLE_SETTINGS + "("
+                    + COLUMN_SETTINGS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    + COLUMN_SETTINGS_KEY + " TEXT,"
+                    + COLUMN_SETTINGS_VALUE + " TEXT"
                     + ")";
 
     public DBHelper(Context context) {
@@ -43,16 +65,18 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_USERS);
+        db.execSQL(CREATE_TABLE_SETTINGS);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
         onCreate(db);
     }
 
     // Function to insert a new user into the database
-    public void insertUser(String username, String email, String enrollment, String block, String password) {
+    public void insertUser(String username, String email, String enrollment, String block, String password, String phone) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_USERNAME, username);
@@ -61,6 +85,10 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(COLUMN_BLOCK, block);
         values.put(COLUMN_PASSWORD, password);
         values.put(COLUMN_STATUS,"0");
+        values.put(COLUMN_PHONE , phone);
+
+        values.put(COLUMN_PAYMENT_DATE, "1111-11-11");
+
         db.insert(TABLE_USERS, null, values);
         db.close();
     }
@@ -86,7 +114,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 COLUMN_EMAIL,
                 COLUMN_ENROLLMENT,
                 COLUMN_BLOCK,
-                COLUMN_PASSWORD
+                COLUMN_PHONE,
+                COLUMN_PAYMENT_DATE
         };
 
         // Define the selection criteria
@@ -102,13 +131,11 @@ public class DBHelper extends SQLiteOpenHelper {
                 null,               // don't filter by row groups
                 null                // don't sort the order
         );
+
         String[] userDetailsArray = null;
-        // Check if the cursor contains any data
         if (cursor.moveToFirst()) {
-            // Initialize the array with the appropriate size
             userDetailsArray = new String[cursor.getColumnCount()];
 
-            // Retrieve user details from cursor and store them in the array
             for (int i = 0; i < cursor.getColumnCount(); i++) {
                 userDetailsArray[i] = cursor.getString(i);
             }
@@ -133,7 +160,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 COLUMN_ENROLLMENT,
                 COLUMN_BLOCK,
                 COLUMN_PASSWORD,
-                COLUMN_STATUS
+                COLUMN_STATUS,
+                COLUMN_PAYMENT_DATE
         };
 
         Cursor cursor = db.query(TABLE_USERS, columns, null, null, null, null, null);
@@ -154,5 +182,50 @@ public class DBHelper extends SQLiteOpenHelper {
         return usersList;
     }
 
+    public void updatePaymentStatus(String email, String paymentDate, String status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_PAYMENT_DATE, paymentDate);
+        values.put(COLUMN_STATUS, status);
+        db.update(TABLE_USERS, values, COLUMN_EMAIL + " = ?", new String[]{email});
+        db.close();
+    }
+
+    public void updateSetting(String key, String value) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_SETTINGS_VALUE, value);
+
+        int rows = db.update(TABLE_SETTINGS, values, COLUMN_SETTINGS_KEY + " = ?", new String[]{key});
+
+        if (rows == 0) { // If the setting does not exist, insert it
+            values.put(COLUMN_SETTINGS_KEY, key);
+            db.insert(TABLE_SETTINGS, null, values);
+        }
+
+        db.close();
+    }
+
+    @SuppressLint("Range")
+    public String getSetting(String key) {
+        String value = null;
+
+        try {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_SETTINGS, new String[]{COLUMN_SETTINGS_VALUE}, COLUMN_SETTINGS_KEY + " = ?", new String[]{key}, null, null, null);
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                value = cursor.getString(cursor.getColumnIndex(COLUMN_SETTINGS_VALUE));
+            }
+            cursor.close();
+        }
+        db.close();
+        }
+        catch (Exception e){
+            Log.e("getSetting: askfd", e.toString() );
+        }
+        return value != null ? value : "";
+    }
 }
 

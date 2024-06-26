@@ -3,11 +3,13 @@ package com.jignesh.messminder;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,6 +19,7 @@ import java.util.List;
 public class AdminActivity extends AppCompatActivity {
     private DBHelper dbHelper;
     private LinearLayout usersContainer;
+    private Button schedule;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,12 @@ public class AdminActivity extends AppCompatActivity {
             addUserCard(user);
             Log.e("User Name:12334 ", user[1]);
         }
+
+        schedule = findViewById(R.id.schedulebtn);
+
+        schedule.setOnClickListener(e->{
+            startActivity(new Intent(AdminActivity.this, settings.class));
+        });
     }
 
     private void addUserCard(String[] userDetails) {

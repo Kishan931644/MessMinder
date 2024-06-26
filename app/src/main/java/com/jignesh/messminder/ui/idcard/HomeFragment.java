@@ -4,12 +4,12 @@ import static android.Manifest.permission.MANAGE_EXTERNAL_STORAGE;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
 import android.os.Environment;
@@ -35,15 +35,18 @@ import com.jignesh.messminder.databinding.FragmentHomeBinding;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+
+import org.xmlpull.v1.XmlPullParser;
 
 public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
-    private TextView nameTextView;
-    private TextView enrollmentTextView;
-    private TextView numberTextView;
-    private TextView emailTextView;
-    private TextView blockTextView;
-    private TextView paymentTextView;
+    private TextView nameTextView, enrollmentTextView, numberTextView, emailTextView, blockTextView, paymentTextView, paymentDateTextView;
     private Button btnDownloadPDF;
     DBHelper dbHelper;
 
@@ -53,6 +56,7 @@ public class HomeFragment extends Fragment {
     // creating a bitmap variable
     // for storing our images
     Bitmap bmp, scaledbmp;
+    String userEmail;
 
     private static final int PERMISSION_REQUEST_CODE = 200;
 
@@ -70,99 +74,105 @@ public class HomeFragment extends Fragment {
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.avataar);
         scaledbmp = Bitmap.createScaledBitmap(bmp, 140, 140, false);
 
-        try {
-            String email = Utilities.getEmail(requireContext());
-            Toast.makeText(requireContext(), email, Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            Toast.makeText(requireContext(), e.toString(), Toast.LENGTH_SHORT).show();
-        }
 
-        if (checkPermission()) {
-            Toast.makeText(requireContext(), "Permission Granted", Toast.LENGTH_SHORT).show();
-        } else {
+        nameTextView = binding.name;
+        enrollmentTextView = binding.enrollment;
+        blockTextView = binding.block;
+        paymentTextView = binding.payment;
+        emailTextView = binding.email;
+        numberTextView = binding.number;
+        paymentDateTextView = binding.paymentdate;
+
+        if (!checkPermission()) {
             requestPermission();
         }
 
-        btnDownloadPDF.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                generatePDF();
-            }
-        });
+        try {
+            userEmail = Utilities.getEmail(requireContext());
 
-//        try {
-//            // Fetch data from the database (replace with your actual database access code)
-//            String userEmail = getArguments().getString("email");
-//            dbHelper = new DBHelper(getActivity());
-//            String[] userDetailsArray = dbHelper.getUserByEmail(userEmail);
-//
-//            // Check if user details array is not null
-//            if (userDetailsArray != null) {
-//                // Access individual elements of the array
-//
-//                String name = userDetailsArray[1];
-//                String email = userDetailsArray[2];
-//                String enrollment = userDetailsArray[3];
-//                String block = userDetailsArray[4];
-//                String paymentStatus = "Pending";
-//
-//                // Set values to TextViews
-//                nameTextView.setText(name);
-//                enrollmentTextView.setText(enrollment);
-//
-//                emailTextView.setText(email);
-//                blockTextView.setText(block);
-//                paymentTextView.setText(paymentStatus);
-//            }
-//        } catch (Exception e) {
-//            Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_SHORT);
-//        }
+            dbHelper = new DBHelper(getActivity());
+            String[] userDetailsArray = dbHelper.getUserByEmail(userEmail);
+
+            if (userDetailsArray != null) {
+                String name = userDetailsArray[1];
+                String email = userDetailsArray[2];
+                String enrollment = userDetailsArray[3];
+                String block = userDetailsArray[4];
+                String num = userDetailsArray[5];
+                String paymentDate = userDetailsArray[6];
+                String paymentStatus = "Pending";
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+                try {
+                    Date paymentDateObj = sdf.parse(paymentDate);
+                    Date currentDate = new Date();
+                    long differenceInMillis = currentDate.getTime() - paymentDateObj.getTime();
+                    long differenceInDays = differenceInMillis / (1000 * 60 * 60 * 24);
+
+                    if (differenceInDays <= 30) {
+                        paymentStatus = "Complete";
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                paymentTextView.setText(paymentStatus);
+                nameTextView.setText(name);
+                enrollmentTextView.setText(enrollment);
+                emailTextView.setText(email);
+                blockTextView.setText(block);
+                paymentTextView.setText(paymentStatus);
+                numberTextView.setText(num);
+                paymentDateTextView.setText(paymentDate);
+            }
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "e.toString()", Toast.LENGTH_SHORT);
+        }
+
+
+        btnDownloadPDF.setOnClickListener(view -> generatePDF());
 
         return root;
     }
+    private Bitmap getBitmapFromView(View view) {
+        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+        return bitmap;
+    }
 
     private void generatePDF() {
-        PdfDocument pdfDocument = new PdfDocument();
+        View content = binding.cardview;
 
-        Paint paint = new Paint();
-        Paint title = new Paint();
+        // Create a bitmap of the view
+        Bitmap bitmap = getBitmapFromView(content);
 
-        PdfDocument.PageInfo mypageInfo = new PdfDocument.PageInfo.Builder(pagewidth, pageHeight, 1).create();
+        // Create a PdfDocument
+        PdfDocument document = new PdfDocument();
 
-        PdfDocument.Page myPage = pdfDocument.startPage(mypageInfo);
+        // Define the page info and the content rect
+        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(bitmap.getWidth(), bitmap.getHeight(), 1).create();
+        PdfDocument.Page page = document.startPage(pageInfo);
 
-        Canvas canvas = myPage.getCanvas();
+        // Draw the bitmap onto the page
+        Canvas canvas = page.getCanvas();
+        canvas.drawBitmap(bitmap, 0, 0, null);
+        document.finishPage(page);
 
-        canvas.drawBitmap(scaledbmp, 56, 40, paint);
-
-        title.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
-
-        title.setTextSize(15);
-
-        title.setColor(ContextCompat.getColor(requireContext(), R.color.purple_200));
-
-        canvas.drawText("A portal for IT professionals.", 209, 100, title);
-        canvas.drawText("Geeks for Geeks", 209, 80, title);
-
-        title.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-        title.setColor(ContextCompat.getColor(requireContext(), R.color.purple_200));
-        title.setTextSize(15);
-
-        title.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText("This is sample document which we have created.", 396, 560, title);
-        pdfDocument.finishPage(myPage);
-
+        // Save the PDF to a file
+        String pdfPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
+        File file = new File(pdfPath, "generated_pdf.pdf");
         try {
-            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "", "iCard.pdf");
-
-            pdfDocument.writeTo(new FileOutputStream(file));
-
-            Toast.makeText(requireContext(), "PDF file generated successfully.", Toast.LENGTH_SHORT).show();
+            document.writeTo(new FileOutputStream(file));
+            Toast.makeText(getContext(), "PDF created successfully", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
-            Toast.makeText(requireContext(), e.toString(), Toast.LENGTH_SHORT).show();
+            Log.e("PDF Creation", "Error writing PDF: " + e.getMessage());
+            Toast.makeText(getContext(), "Error creating PDF", Toast.LENGTH_SHORT).show();
         }
-        pdfDocument.close();
-    }
+
+        // Close the document
+        document.close();    }
+
 
     private boolean checkPermission() {
         int permission1 = ContextCompat.checkSelfPermission(requireContext(), WRITE_EXTERNAL_STORAGE);

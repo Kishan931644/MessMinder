@@ -39,11 +39,11 @@ public class NotificationsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 EasyUpiPayment.Builder builder = new EasyUpiPayment.Builder(requireActivity())
-                        .setPayeeVpa("kishanrathod9679561@ybl")
-                        .setPayeeName("Kishan rathod")
-                        .setPayeeMerchantCode("5812")
+                        .setPayeeVpa("")
+                        .setPayeeName("")
+                        .setPayeeMerchantCode("")
                         .setTransactionId("T"+System.currentTimeMillis()+ "_" + new Random().nextInt(1000))
-                        .setTransactionRefId("T037033025024")
+                        .setTransactionRefId("")
                         .setDescription("Mess fees Payment")
                         .setAmount("10.00");
                 try {
